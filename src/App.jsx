@@ -1,18 +1,16 @@
-// import { useState } from "react";
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "./assets/vite.svg";
-// import heroImg from "./assets/hero.png";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Weather from "./components/Weather";
 
 import "./App.css";
 
-function App() {
-  // const [count, setCount] = useState(0);
+const queryClient = new QueryClient();
 
+function App() {
   return (
     <>
-      <Weather />
+      <QueryClientProvider client={queryClient}>
+        <Weather />
+      </QueryClientProvider>
     </>
   );
 }
