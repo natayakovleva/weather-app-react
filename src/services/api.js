@@ -2,19 +2,24 @@ import axios from "axios";
 
 const weatherUrl = "https://api.openweathermap.org/data/2.5/";
 const currentWeatherUrl = `${weatherUrl}/weather`;
+const forecastWeatherUrl = `${weatherUrl}/forecast`;
 
 const apiKey = import.meta.env.VITE_API_KEY;
 
-export const fetchWeatherByCity = async (query) => {
-  if (!query) return null;
+export const fetchWeatherByCity = async (searchQuery) => {
+  if (!searchQuery) return null;
 
   const params = {
-    q: query,
+    q: searchQuery,
     units: "metric",
     appid: apiKey,
   };
 
-  const current = await axios.get(currentWeatherUrl, { params });
+  const [current, forecast] = await Promise.all([
+    axios.get(currentWeatherUrl, { params }),
+    axios.get(forecastWeatherUrl, { params }),
+  ]);
 
-  return current.data;
+  // return current.data;
+  return { currentWeather: current.data, forecast: forecast.data };
 };
