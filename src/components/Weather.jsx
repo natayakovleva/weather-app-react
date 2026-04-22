@@ -5,37 +5,35 @@ import WeatherCard from "./WeatherCard";
 import Forecast from "./Forecast";
 
 export default function Weather() {
-  // 1. Ініціалізація стану з localStorage
+  const [unit, setUnit] = useState("C");
+
+  const toggleUnit = () => setUnit((prev) => (prev === "C" ? "F" : "C"));
+
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
 
-  // 2. Ефект для зміни класу на рівні всього документа
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark]);
   //-----------------------------------
 
-  const [city, setCity] = useState("London");
-  const [searchQuery, setSearchQuery] = useState("London");
+  const DEFAULT_CITY = "London";
+
+  const [city, setCity] = useState(DEFAULT_CITY);
+  const [searchQuery, setSearchQuery] = useState(DEFAULT_CITY);
 
   const { data, isLoading, error } = useFetchWeather(searchQuery);
 
-  const { currentWeather, forecast } = data || {};
-
-  console.log(currentWeather);
+  // const { currentWeather, forecast } = data || {};
+  const currentWeather = data?.currentWeather;
+  const forecast = data?.forecast;
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (city.trim()) {
-      setSearchQuery(city.trim());
-    }
+
+    setSearchQuery(city.trim());
   };
 
   return (
@@ -49,6 +47,9 @@ export default function Weather() {
       p-3 sm:p-6
     "
     >
+      {isLoading && <p className="text-white">Loading...</p>}
+
+      {error && <p className="text-red-400">Something went wrong ...</p>}
       <div
         className="
         w-full max-w-5xl
@@ -61,7 +62,10 @@ export default function Weather() {
       "
       >
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-          🌤 Weather App
+          <span role="img" aria-label="weather">
+            🌤
+          </span>{" "}
+          Weather App
         </h1>
 
         <Header
@@ -87,11 +91,16 @@ export default function Weather() {
               wind={currentWeather.wind.speed}
               pressure={currentWeather.main.pressure}
               clouds={currentWeather.clouds.all}
+              unit={unit}
+              setUnit={toggleUnit}
             />
           </div>
         )}
-
-        {forecast && <Forecast forecast={forecast} />}
+        <div className="mt-4">
+          {forecast?.list && (
+            <Forecast forecast={forecast} unit={unit} setUnit={toggleUnit} />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,40 +1,51 @@
-// src/components/WeatherCard.jsx
+import { getShortDate, getTime } from "../units/date";
+import { formatTemp } from "../units/temperature";
 import Icon from "./Icon";
 import { weatherIconMap } from "../constants/weatherIconMap";
 import { uiIconMap } from "../constants/uiIconMap";
 
+const getStats = (props) => [
+  { label: "Humidity", value: `${props.humidity}%` },
+  { label: "Wind", value: `${props.wind} m/s` },
+  { label: "Pressure", value: `${props.pressure} hPa` },
+  { label: "Clouds", value: `${props.clouds}%` },
+];
+
 export default function WeatherCard(props) {
+  const stats = getStats(props);
+
   return (
     <div
-      className="bg-white/50 dark:bg-white/10
-      backdrop-blur-xl
-      rounded-3xl
-      p-5 sm:p-6
-      shadow-xl
-      text-gray-800 dark:text-white"
+      className="bg-white/40 dark:bg-white/10
+    backdrop-blur-2xl
+    rounded-3xl
+    p-6
+    shadow-2xl
+    border border-white/30 dark:border-white/10
+    text-gray-800 dark:text-white"
     >
-      {/* HEADER: місто + дата */}
       <div className="mb-4">
         <h2 className="text-2xl sm:text-3xl font-bold">{props.city}</h2>
-        <p className="text-sm opacity-70">
-          {new Date(props.date * 1000).toLocaleString("uk-UA", {
-            day: "numeric",
-            month: "long",
-          })}
-        </p>
+        <p className="text-sm opacity-70">{getShortDate(props.date)}</p>
       </div>
 
-      {/* TEMP + DETAILS */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-        {/* LEFT: temp + feels like + sunrise/sunset */}
         <div>
-          <p className="text-5xl font-extrabold tracking-tight">
-            {Math.round(props.temp)}°C
+          <p
+            className="text-6xl font-extrabold
+    cursor-pointer
+    tracking-tight
+    select-none
+    hover:scale-105
+    transition-transform"
+            onClick={props.setUnit}
+          >
+            {formatTemp(props.temp, props.unit)}
           </p>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-sm mt-1 text-gray-500 dark:text-gray-300">
             feels like{" "}
-            <span className="font-medium text-blue-800">
-              {Math.round(props.feels_like)}°C
+            <span className="font-medium">
+              {formatTemp(props.feels_like, props.unit)}
             </span>
           </p>
 
@@ -46,13 +57,7 @@ export default function WeatherCard(props) {
                 size={32}
                 className="text-yellow-400"
               />
-              <p>
-                Sunrise:{" "}
-                {new Date(props.sunrise * 1000).toLocaleTimeString("uk-UA", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+              <p>Sunrise: {getTime(props.sunrise)}</p>
             </div>
             <div className="flex items-center gap-2">
               <Icon
@@ -61,18 +66,11 @@ export default function WeatherCard(props) {
                 size={32}
                 className="text-orange-400"
               />
-              <p>
-                Sunset:{" "}
-                {new Date(props.sunset * 1000).toLocaleTimeString("uk-UA", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+              <p>Sunset: {getTime(props.sunset)}</p>
             </div>
           </div>
         </div>
 
-        {/* RIGHT: weather icon + description */}
         <div className="text-center sm:text-right">
           <Icon name={props.icon} iconMap={weatherIconMap} size={80} />
           <p className="text-lg font-semibold capitalize mt-2 text-blue-900">
@@ -81,38 +79,26 @@ export default function WeatherCard(props) {
         </div>
       </div>
 
-      {/* GRID CARDS: Humidity, Wind, Pressure, Clouds */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-        {[
-          {
-            label: "Humidity",
-            value: `${props.humidity}%`,
-            color: "text-blue-500",
-          },
-          { label: "Wind", value: `${props.wind} m/s`, color: "text-blue-500" },
-          {
-            label: "Pressure",
-            value: `${props.pressure} hPa`,
-            color: "text-blue-500",
-          },
-          {
-            label: "Clouds",
-            value: `${props.clouds}%`,
-            color: "text-blue-500",
-          },
-        ].map((item) => (
+        {stats.map((item) => (
           <div
             key={item.label}
-            className="bg-white/30
-      backdrop-blur-md
-      rounded-xl
-      p-3
-      text-center
-      hover:scale-105
-      transition"
+            className="
+        bg-white/30 dark:bg-white/5
+        backdrop-blur-md
+        rounded-xl
+        p-3
+        text-center
+        transition
+        hover:scale-105 hover:shadow-md
+      "
           >
-            <p className="text-xs opacity-70">{item.label}</p>
-            <p className={`font-semibold ${item.color}`}>{item.value}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {item.label}
+            </p>
+            <p className="font-semibold text-gray-800 dark:text-white">
+              {item.value}
+            </p>
           </div>
         ))}
       </div>

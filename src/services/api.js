@@ -20,6 +20,8 @@ export const fetchWeatherByCity = async (searchQuery) => {
     axios.get(forecastWeatherUrl, { params }),
   ]);
 
-  // return current.data;
-  return { currentWeather: current.data, forecast: forecast.data };
+  return {
+    currentWeather: current.data,
+    forecast: forecast.data,
+  };
 };
